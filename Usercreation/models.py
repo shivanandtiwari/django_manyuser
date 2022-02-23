@@ -1,4 +1,6 @@
 
+from email.policy import default
+from xmlrpc.client import Boolean
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -29,17 +31,16 @@ class MyAccountManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
-
+   
 class Users(AbstractBaseUser,PermissionsMixin):
     Email_Address = models.EmailField(verbose_name="email", max_length=60, unique=True, blank=True, null=True, default=None)
     Date_of_Birth = models.CharField(max_length=30, blank=True, null=True, default=None)
     name = models.CharField(max_length=30, blank=True, null=True)
     username= models.CharField(max_length=30,unique=True, blank=True, null=True)
     zipcode = models.CharField(max_length=30, blank=True, null=True)
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_super_teacher = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     organization_admin = models.BooleanField(default=False)
     oganiztioncontroller = models.BooleanField(default=False)

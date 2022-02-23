@@ -1,5 +1,6 @@
 import json
 from sqlite3 import IntegrityError
+from itsdangerous import Serializer
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.forms import ValidationError
@@ -13,6 +14,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 
+
 # @api_view(["POST"])
 # @permission_classes([AllowAny])
 # def Register_Users(request):
@@ -20,22 +22,22 @@ from rest_framework import generics
 #         data = {}
 #         serializer = RegistrationSerializer(data=request.data)
 #         if serializer.is_valid():
-#             user = Users.objects.filter(Email_Address = serializer.data['Email_Address'])
-#             # user = Users.objects.get(password = serializer.data['password'])
-#             token = Token.objects.get_or_create(user=user)[0].key
+#             account = serializer.save()
+#             account.is_active = True
+#             account.save()
+#             token = Token.objects.get_or_create(user=account)[0].key
 #             data["message"] = "user registered successfully"
-#             data["email"] = user.Email_Address
-#             data["name"] = user.name
+#             data["email"] = account.Email_Address
+#             data["username"] = account.name
 #             data["token"] = token
 
 #         else:
 #             data = serializer.errors
-        
 
 
-#         return Response(data,{'status':200,'payload':serializer.data})
+#         return Response(data)
 #     except IntegrityError as e:
-#         account=Users.objects.get(user='')
+#         account=Users.objects.get(username='')
 #         account.delete()
 #         raise ValidationError({"400": f'{str(e)}'})
 
@@ -46,7 +48,7 @@ from rest_framework import generics
 @permission_classes([AllowAny])
 def Register_Users(request):
     try:
-        data = []
+        data = {}
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             account = serializer.save()
@@ -54,8 +56,8 @@ def Register_Users(request):
             account.save()
             token = Token.objects.get_or_create(user=account)[0].key
             data["message"] = "user registered successfully"
-            data["email"] = account.email
-            data["username"] = account.username
+            data["email"] = account.Email_Address
+            data["username"] = account.name
             data["token"] = token
 
         else:
@@ -71,6 +73,7 @@ def Register_Users(request):
     except KeyError as e:
         print(e)
         raise ValidationError({"400": f'Field {str(e)} missing'})
+
 
 
 @api_view(["POST"])
@@ -122,7 +125,7 @@ class OrganizationView(APIView):
 class CampignsView(APIView):
     serializer_class =  CampaignsSerializer
     def post(self,request):
-        serializer = self.serializer_class(data=request.data.id)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
